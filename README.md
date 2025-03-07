@@ -21,8 +21,8 @@ git submodule update
 
 ### Download archive
 
-* [csc43043ep_practice_code.zip](https://imagecomputing.net/damien.rohmer/teaching/CSC_43043_EP/code/csc43043ep_practice_code.zip)
-* [csc43043ep_practice_code.tar.gz](https://imagecomputing.net/damien.rohmer/teaching/CSC_43043_EP/code/csc43043ep_practice_code.tar.gz)
+* [csc43043ep_practice_code.zip](https://graphicscomputing.fr/course/2024_2025/CSC_43043_EP/lab_code/csc43043ep_practice_code.zip)
+* [csc43043ep_practice_code.tar.gz](https://graphicscomputing.fr/course/2024_2025/CSC_43043_EP/lab_code/csc43043ep_practice_code.tar.gz)
 
 
 _Note: Do not use the "Code -> Download ZIP" option from the GitHub GUI as you won't get the CGP library as submodule with the code._
