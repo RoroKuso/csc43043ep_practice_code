@@ -22,14 +22,23 @@ void scene_structure::initialize()
 
 	int N_terrain_samples = 100;
 	float terrain_length = 20;
-	mesh const terrain_mesh = create_terrain_mesh(N_terrain_samples, terrain_length);
+	terrain_mesh = create_terrain_mesh(N_terrain_samples, terrain_length);
 	terrain.initialize_data_on_gpu(terrain_mesh);
 	terrain.material.color = { 0.6f,0.85f,0.5f };
 	terrain.material.phong.specular = 0.0f; // non-specular terrain material
 
+	update_terrain(terrain_mesh, terrain, parameters);
+
+	mesh const tree_mesh = create_tree();
+	tree.initialize_data_on_gpu(tree_mesh);
+	tree.model.translation = vec3{1.0f, 1.0f, evaluate_terrain_height(1.0f, 1.0f)};
+	positions = generate_positions_on_terrain(20, 20.0f);
+	
+	terrain.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_grass.jpg",
+		GL_REPEAT,
+		GL_REPEAT);
+
 }
-
-
 
 void scene_structure::display_frame()
 {
@@ -40,9 +49,15 @@ void scene_structure::display_frame()
 		draw(global_frame, environment);
 
 	draw(terrain, environment);
-	if (gui.display_wireframe)
+	
+	for (auto pos: positions) {
+		tree.model.translation = pos;
+		draw(tree, environment);
+	}
+	if (gui.display_wireframe) {
 		draw_wireframe(terrain, environment);
-
+		draw_wireframe(tree, environment);
+	}
 }
 
 

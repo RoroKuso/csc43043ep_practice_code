@@ -33,7 +33,8 @@ struct scene_structure : cgp::scene_inputs_generic {
 	// Elements and shapes of the scene
 	// ****************************** //
 
-	cgp::mesh_drawable shape;
+	cgp::mesh_drawable shape1;
+	cgp::mesh_drawable shape2;
 
 
 

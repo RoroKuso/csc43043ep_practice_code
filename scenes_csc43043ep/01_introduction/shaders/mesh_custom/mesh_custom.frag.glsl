@@ -34,6 +34,8 @@ uniform mat4 view;       // View matrix (rigid transform) of the camera - to com
 
 uniform vec3 light; // position of the light
 
+uniform float time;
+
 
 
 // Coefficients of phong illumination model
@@ -127,4 +129,19 @@ void main()
 	
 	// Output color, with the alpha component
 	FragColor = vec4(color_shading, material.alpha * color_image_texture.a);
+
+	// FragColor = vec4(0.9, 0.05, 0.59, 0.0);
+	// FragColor = abs(vec4(cos(fragment.position.x), 0.0, 0.0, 0.0));
+	// FragColor = abs(vec4(N.x, N.y, N.z, 0.0));
+	// rem. N represente la normale de la surface (dont la norme est 1).
+	// FragColor = 0.8*vec4(color_shading, material.alpha * color_image_texture.a) 
+    //        + 0.2*abs(vec4(cos(10.0*fragment.position.z), 0.0, 0.0, 0.0));
+	// if(cos(25.0*fragment.position.z)<-0.9f) {
+	// 	discard;
+	// 	// discard signifie l'arrêt du fragment shader
+	// 	//  aucune couleur n'est affichée après discard
+	// 	//  le pixel correspondant sera donc transparent.
+	// }
+
+
 }

@@ -21,13 +21,21 @@ out struct fragment_data
 uniform mat4 model; // Model affine transform matrix associated to the current shape
 uniform mat4 view;  // View matrix (rigid transform) of the camera
 uniform mat4 projection; // Projection (perspective or orthogonal) matrix of the camera
+uniform float time;
+uniform float frequency; // Oscillation frequency
 
 
 void main()
 {
 
 	// The position of the vertex in the world space
-	vec4 position = model * vec4(vertex_position, 1.0);
+	mat4 M = transpose(
+    mat4(1.0 + 0.2 * cos(vertex_position.z + frequency*time), 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0));
+
+	vec4 position = M * model * vec4(vertex_position, 1.0);
 
 	// The normal of the vertex in the world space
 	mat4 modelNormal = transpose(inverse(model));

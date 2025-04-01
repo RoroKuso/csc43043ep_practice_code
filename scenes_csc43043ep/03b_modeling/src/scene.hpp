@@ -3,6 +3,7 @@
 
 #include "cgp/cgp.hpp"
 #include "environment.hpp"
+#include "terrain.hpp"
 
 
 // This definitions allow to use the structures: mesh, mesh_drawable, etc. without mentionning explicitly cgp::
@@ -37,7 +38,11 @@ struct scene_structure : cgp::scene_inputs_generic {
 	// Elements and shapes of the scene
 	// ****************************** //
 
+	cgp::mesh terrain_mesh;
 	cgp::mesh_drawable terrain;
+	cgp::mesh_drawable tree;
+	std::vector<cgp::vec3> positions;
+	perlin_noise_parameters parameters;
 
 
 

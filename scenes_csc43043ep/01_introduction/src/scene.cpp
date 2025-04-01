@@ -20,10 +20,11 @@ void scene_structure::initialize()
 		{ 3.0f, -2.0f, 1.5f } /* position of the camera in the 3D scene */,
 		{0,0,0} /* targeted point in 3D scene */,
 		{0,0,1} /* direction of the "up" vector */);
-
+	
 
 	// General information
 	display_info();
+	std::cout << str_pretty(camera_projection.matrix()) << std::endl;
 
 	// Create the global (x,y,z) frame
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
@@ -37,6 +38,11 @@ void scene_structure::initialize()
 	// a mesh is simply a container of vertex data (position,normal,color,uv) and triangle index
 	// the mesh data are stored on the CPU memory - they will need to be sent to the GPU memory before being drawn
 
+	mesh sphere_mesh = mesh_primitive_sphere(1.0f);
+
+	// mesh_load_file_obj: lit un fichier .obj et renvoie une structure mesh lui correspondant
+	mesh camel_mesh = mesh_load_file_obj(project::path + "assets/camel.obj");
+
 	// Initialize a mesh drawable from a mesh structure
 	//   - mesh : store buffer of data (vertices, indices, etc) on the CPU. The mesh structure is convenient to manipulate in the C++ code but cannot be displayed (data is not on GPU).
 	//   - mesh_drawable : store VBO associated to elements on the GPU + associated uniform parameters. A mesh_drawable can be displayed using the function draw(mesh_drawable, environment). It only stores the indices of the buffers on the GPU - the buffer of data cannot be directly accessed in the C++ code through a mesh_drawable.
@@ -44,6 +50,16 @@ void scene_structure::initialize()
 	cube.initialize_data_on_gpu(cube_mesh);
 	cube.material.color = { 1,1,0 };  // set the color of the cube (R,G,B) - sent as uniform parameter to the shader when display is called.
 	cube.model.translation = { 1,1,0 }; // set the position of the cube - translation applied as uniform parameter to the "model matrix" in the shader when display is called.
+
+	sphere.initialize_data_on_gpu(sphere_mesh);
+	sphere.model.scaling = 0.3f; // coordinates are multiplied by 0.2 in the shader
+	sphere.model.translation = { 1,2,0 }; // coordinates are offseted by {1,2,0} in the shader
+	sphere.material.color = { 1,0.5f,0.5f }; // sphere will appear red (r,g,b components in [0,1])
+
+	// Initialisation classique de la structure mesh_drawable
+	camel.initialize_data_on_gpu(camel_mesh);
+	camel.model.scaling = 0.5f;
+	camel.model.translation = { -1,1,0.5f };
 
 	// Same process for the ground which is a plane 
 	//  A quadrangle is defined a plane with 4-extremal corners.
@@ -57,6 +73,16 @@ void scene_structure::initialize()
 	ground.initialize_data_on_gpu(ground_mesh);
 	ground.texture.load_and_initialize_texture_2d_on_gpu(project::path+"assets/checkboard.png");
 
+	// Load a shader from a file
+	opengl_shader_structure shader_custom;
+	shader_custom.load(
+		project::path + "shaders/mesh_custom/mesh_custom.vert.glsl", 
+		project::path + "shaders/mesh_custom/mesh_custom.frag.glsl");
+
+	// Affect the loaded shader to the mesh_drawable
+	camel.shader = shader_custom;
+	cube.shader = shader_custom;
+	sphere.shader = shader_custom;
 
 
 
@@ -71,18 +97,35 @@ void scene_structure::initialize()
 void scene_structure::display_frame()
 {
 
+	// glDisable(GL_DEPTH_TEST);
 
 	// Set the light to the current position of the camera
 	environment.light = camera_control.camera_model.position();
 
 	// Update time
 	timer.update();
+
+	environment.uniform_generic.uniform_float["time"] = timer.t;
+	environment.uniform_generic.uniform_float["frequency"] = gui.frequency;
+
+	// std::cout << timer.t<< std::endl;
 	
 	// the general syntax to display a mesh is:
 	//   draw(mesh_drawableName, environment);
 	// Note: scene is used to set the uniform parameters associated to the camera, light, etc. to the shader
+	
 	draw(ground, environment);
-	draw(cube, environment);	
+	draw(cube, environment);
+	draw(sphere, environment);
+	draw(camel, environment);
+	
+	if (gui.display_wireframe) {
+		draw_wireframe(camel, environment, {1,0,0});
+		draw_wireframe(ground, environment);
+		draw_wireframe(sphere, environment);
+		draw_wireframe(cube, environment);
+	}
+	
 
 
 	// conditional display of the global frame (set via the GUI)
@@ -99,6 +142,11 @@ void scene_structure::display_frame()
 void scene_structure::display_gui()
 {
 	ImGui::Checkbox("Frame", &gui.display_frame);
+	ImGui::Checkbox("Wireframe", &gui.display_wireframe);
+	ImGui::SliderFloat("camel-x", &camel.model.translation.x, -2.0f, 2.0f);
+	ImGui::SliderFloat("FOV", &camera_projection.field_of_view, Pi / 18.0f, Pi * (1.66f) / 2.0f);
+	ImGui::SliderFloat("frequency", &gui.frequency, 0.0f, 10.0f);
+
 }
 
 void scene_structure::mouse_move_event()
