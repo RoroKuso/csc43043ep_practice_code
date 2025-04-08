@@ -23,14 +23,19 @@ vec3 interpolation(float t, numarray<vec3> const& key_positions, numarray<float>
 
     // Get parameters (time and position) used to compute the linear interpolation
     //   (You will need to get more parameters for the spline interpolation)
+    float t0 = key_times[idx-1]; // = t_{i-1}
     float t1 = key_times[idx  ]; // = t_i
     float t2 = key_times[idx+1]; // = t_{i+1}
+    float t3 = key_times[idx+2]; // = t_{i+2}
 
+    vec3 const& p0 = key_positions[idx-1]; // = p_{i-1}
     vec3 const& p1 = key_positions[idx  ]; // = p_i
     vec3 const& p2 = key_positions[idx+1]; // = p_{i+1}
+    vec3 const& p3 = key_positions[idx+2]; // = p_{i+2}
 	
     // Call the interpolation
-	vec3 p = linear_interpolation(t, t1,t2, p1,p2);
+	// vec3 p = linear_interpolation(t, t1,t2, p1,p2);
+    vec3 p = cardinal_spline_interpolation(t, t0, t1, t2, t3, p0, p1, p2, p3, 0.5f);
 
     return p;
 }
@@ -61,8 +66,10 @@ vec3 linear_interpolation(float t, float t1, float t2, vec3 const& p1, vec3 cons
 vec3 cardinal_spline_interpolation(float t, float t0, float t1, float t2, float t3, vec3 const& p0, vec3 const& p1, vec3 const& p2, vec3 const& p3, float K)
 {
     // To do: fill the function to compute p(t) as a cardinal spline interpolation
-    vec3 const p = {0,0,0};
-
+    float s = (t - t1) / (t2 - t1);
+    vec3 d1 = 2.0f * K * (p2 - p0) / (t2 - t0);
+    vec3 d2 = 2.0f * K * (p3 - p1) / (t3 - t1);
+    vec3 const p = (2*s*s*s - 3*s*s + 1)*p1 + (s*s*s - 2*s*s + s)*d1 + (-2*s*s*s + 3*s*s)*p2 + (s*s*s - s*s)*d2;
     return p;
 }
 
