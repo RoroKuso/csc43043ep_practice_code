@@ -20,19 +20,19 @@ void scene_structure::initialize()
 
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
-	int N_terrain_samples = 100;
+	int N_terrain_samples = 1000;
 	float terrain_length = 20.0f;
-	terrain_mesh = create_terrain_mesh(N_terrain_samples, terrain_length);
+	terrain_mesh = create_terrain_mesh(N_terrain_samples, terrain_length, parameters);
 	terrain.initialize_data_on_gpu(terrain_mesh);
 	terrain.material.color = { 0.6f,0.85f,0.5f };
 	terrain.material.phong.specular = 0.0f; // non-specular terrain material
 
-	update_terrain(terrain_mesh, terrain, parameters);
+	// update_terrain(terrain_mesh, terrain, parameters);
 
 	mesh const tree_mesh = create_tree();
 	tree.initialize_data_on_gpu(tree_mesh);
-	tree.model.translation = vec3{0.0f, 0.0f, evaluate_terrain_height(0.0f, 0.0f)};
-	positions = generate_positions_on_terrain(terrain_mesh, 20, terrain_length);
+	// tree.model.translation = vec3{0.0f, 0.0f, evaluate_terrain_height(0.0f, 0.0f)};
+	positions = generate_positions_on_terrain(30, terrain_length, parameters);
 	terrain.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_grass.jpg",
 		GL_REPEAT,
 		GL_REPEAT);
