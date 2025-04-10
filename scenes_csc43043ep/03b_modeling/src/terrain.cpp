@@ -25,6 +25,13 @@ float evaluate_terrain_height(float x, float y)
     return z;
 }
 
+float evaluate_terrainmesh_height(mesh& terrain, float x, float y, int N, float terrain_length) {
+    const float u = (x / terrain_length) + 0.5f;
+    const float v = y / terrain_length;
+    int const idx = u*N+v;
+	return terrain.position[idx].z;
+}
+
 mesh create_terrain_mesh(int N, float terrain_length)
 {
 
@@ -76,12 +83,13 @@ mesh create_terrain_mesh(int N, float terrain_length)
     return terrain;
 }
 
-std::vector<cgp::vec3> generate_positions_on_terrain(int N, float terrain_length) {
+std::vector<cgp::vec3> generate_positions_on_terrain(mesh& terrain, int N, float terrain_length) {
     std::vector<cgp::vec3> ret;
     for (int i = 0; i < N; i++) {
         float x = rand_uniform(-terrain_length/2, terrain_length/2);
         float y = rand_uniform(-terrain_length/2, terrain_length/2);
-        float z = evaluate_terrain_height(x, y);
+        // float z = evaluate_terrain_height(x, y);
+        float z = evaluate_terrainmesh_height(terrain, x, y, N, terrain_length);
         ret.push_back(vec3{x, y, z});
     }
     return ret;

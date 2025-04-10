@@ -21,7 +21,7 @@ void scene_structure::initialize()
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
 	int N_terrain_samples = 100;
-	float terrain_length = 20;
+	float terrain_length = 20.0f;
 	terrain_mesh = create_terrain_mesh(N_terrain_samples, terrain_length);
 	terrain.initialize_data_on_gpu(terrain_mesh);
 	terrain.material.color = { 0.6f,0.85f,0.5f };
@@ -31,9 +31,8 @@ void scene_structure::initialize()
 
 	mesh const tree_mesh = create_tree();
 	tree.initialize_data_on_gpu(tree_mesh);
-	tree.model.translation = vec3{1.0f, 1.0f, evaluate_terrain_height(1.0f, 1.0f)};
-	positions = generate_positions_on_terrain(20, 20.0f);
-	
+	tree.model.translation = vec3{0.0f, 0.0f, evaluate_terrain_height(0.0f, 0.0f)};
+	positions = generate_positions_on_terrain(terrain_mesh, 20, terrain_length);
 	terrain.texture.load_and_initialize_texture_2d_on_gpu(project::path + "assets/texture_grass.jpg",
 		GL_REPEAT,
 		GL_REPEAT);

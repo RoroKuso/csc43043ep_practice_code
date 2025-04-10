@@ -93,3 +93,7 @@ mesh create_tree()
 
     return tree;
 }
+
+void update_tree_coord(mesh& terrain, float x, float y) {
+    
+}
