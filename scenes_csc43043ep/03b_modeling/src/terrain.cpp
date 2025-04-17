@@ -8,11 +8,6 @@ using namespace cgp;
 // Evaluate 3D position of the terrain for any (x,y)
 float evaluate_terrain_height(float x, float y, float terrain_length, perlin_noise_parameters const& parameters)
 {
-    // vec2 p_0 = { 0, 0 };
-    // float h_0 = 2.0f;
-    // float sigma_0 = 3.0f;
-    // float d = norm(vec2(x, y) - p_0) / sigma_0;
-    // float z = h_0 * std::exp(-d * d);
 
     vec2 p_i[4] = { {-10,-10}, {5,5}, {-3,4}, {6,4} };
     float h_i[4] = {3.0f, -1.5f, 1.0f, 2.0f};
@@ -28,14 +23,6 @@ float evaluate_terrain_height(float x, float y, float terrain_length, perlin_noi
     return z + parameters.terrain_height*noise;
 }
 
-// float evaluate_terrainmesh_height(mesh& terrain, float x, float y, int N_terrain, float terrain_length) {
-//     const float u = (x / terrain_length) + 0.5f;
-//     const float v = (y / terrain_length) + 0.5f;
-//     const float ku = u * (N_terrain-1.0f);
-//     const float kv = v * (N_terrain-1.0f);
-//     int const idx = kv + N_terrain*ku;
-// 	return terrain.position[idx].z;
-// }
 
 mesh create_terrain_mesh(int N, float terrain_length, perlin_noise_parameters const& parameters)
 {
@@ -99,39 +86,3 @@ std::vector<cgp::vec3> generate_positions_on_terrain(int N_tree, float terrain_l
     }
     return ret;
 }
-
-// void update_terrain(mesh& terrain, mesh_drawable& terrain_visual, perlin_noise_parameters const& parameters)
-// {
-// 	// Number of samples in each direction (assuming a square grid)
-// 	int const N = std::sqrt(terrain.position.size());
-
-// 	// Recompute the new vertices
-// 	for (int ku = 0; ku < N; ++ku) {
-// 		for (int kv = 0; kv < N; ++kv) {
-			
-// 			// Compute local parametric coordinates (u,v) \in [0,1]
-//             const float u = ku/(N-1.0f);
-//             const float v = kv/(N-1.0f);
-
-// 			int const idx = ku*N+kv;
-
-// 			// Compute the Perlin noise
-// 			float const noise = noise_perlin({u, v}, parameters.octave, parameters.persistency, parameters.frequency_gain);
-
-// 			// use the noise as height value
-// 			terrain.position[idx].z = parameters.terrain_height*noise;
-
-// 			// use also the noise as color value
-// 			terrain.color[idx] = 0.3f*vec3(0,0.5f,0)+0.7f*noise*vec3(1,1,1);
-// 		}
-// 	}
-
-// 	// Update the normal of the mesh structure
-// 	terrain.normal_update();
-	
-// 	// Update step: Allows to update a mesh_drawable without creating a new one
-// 	terrain_visual.vbo_position.update(terrain.position);
-// 	terrain_visual.vbo_normal.update(terrain.normal);
-// 	terrain_visual.vbo_color.update(terrain.color);
-	
-// }

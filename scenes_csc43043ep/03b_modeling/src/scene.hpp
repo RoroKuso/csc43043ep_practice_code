@@ -4,7 +4,7 @@
 #include "cgp/cgp.hpp"
 #include "environment.hpp"
 #include "terrain.hpp"
-
+#include "key_positions_structure.hpp"
 
 // This definitions allow to use the structures: mesh, mesh_drawable, etc. without mentionning explicitly cgp::
 using cgp::mesh;
@@ -46,6 +46,19 @@ struct scene_structure : cgp::scene_inputs_generic {
 	std::vector<cgp::vec3> grass_positions;
 	perlin_noise_parameters parameters;
 
+	cgp::hierarchy_mesh_drawable hierarchy;
+	cgp::timer_interval timer;
+	keyframe_structure keyframe;
+
+	timer_basic timer_b;
+	mesh_drawable particle_sphere;
+	curve_drawable segment;
+	void simulation_step(float dt);
+	void draw_segment(vec3 const& a, vec3 const& b);
+	// Particles:
+	std::vector<vec3> points;
+	std::vector<vec3> speeds;
+	std::vector<float> L0s;
 
 
 	// ****************************** //

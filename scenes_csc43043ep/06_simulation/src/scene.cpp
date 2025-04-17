@@ -21,24 +21,28 @@ void scene_structure::simulation_step(float dt)
 	// Simulation parameters
 	float m = 0.01f;       // particle mass
 	float K = 5.0f;        // spring stiffness
-	float mu = 0.01f;      // damping coefficient
+	float mu = 0.08f;      // damping coefficient
 
 	vec3 g = { 0,0,-9.81f }; // gravity
 
+	std::vector<vec3> newpoints(points.size());
+	std::vector<vec3> newspeeds(speeds.size());
 
+	for (int i = 0; i < points.size()-2; i++) {
+		vec3 f_spring1 = spring_force(points[i+1], points[i], L0s[i], K);
+		vec3 f_spring2 = spring_force(points[i+1], points[i+2], L0s[i+2], K);
+		vec3 f_weight = m * g;
+		vec3 f_damping = -mu * speeds[i+1];
+		vec3 f = f_spring1 + f_spring2 + f_weight + f_damping;
 
-	// Forces
-	vec3 fB_spring = spring_force(pB, pA, L0, K);
-	vec3 fB_weight = m * g;
-	vec3 fB_damping = -mu * vB;
-	vec3 fB = fB_spring + fB_weight + fB_damping;
+		newspeeds[i+1] = speeds[i+1] + dt * f / m;
+		newpoints[i+1] = points[i+1] + dt * speeds[i+1];
+	}
 
-	// Numerical Integration
-	vB = vB + dt * fB / m;
-	pB = pB + dt * vB;
-
-
-
+	for (int i = 1; i < points.size()-1; i++) {
+		speeds[i] = newspeeds[i];
+		points[i] = newpoints[i];
+	}
 }
 
 
@@ -57,28 +61,20 @@ void scene_structure::initialize()
 	display_info();
 	global_frame.initialize_data_on_gpu(mesh_primitive_frame());
 
-
-	// Initial position and speed of particles
-	// ******************************************* //
-	pA = { 0,0,0 };
-	vB = { 0,0,0 };
-
-	pB = { 0.0f,0.45f,0.0f };
-	vB = { 0,0,0 };
-
-	L0 = 0.4f;
+	int N = 10;
+	for (int n = 0; n < N; n++) {
+		points.push_back( {0, n*0.01f, 0} );
+		speeds.push_back( {0, 0, 0} );
+		L0s.push_back(0.3f);
+	}
+	points.push_back( {0, 2, 0} );
+	speeds.push_back( {0, 0, 0} );
+	L0s.push_back(0.3f);
 
 	particle_sphere.initialize_data_on_gpu(mesh_primitive_sphere(0.05f));
 	segment.display_type = curve_drawable_display_type::Segments;
 	segment.initialize_data_on_gpu({ {0,0,0},{1,0,0} });
-
-
-
 }
-
-
-
-
 
 
 void scene_structure::display_frame()
@@ -92,19 +88,17 @@ void scene_structure::display_frame()
 	// Update the current time
 	timer.update();
 
+	for (int i = 0; i < 10; i++)
+		simulation_step(timer.scale * 0.001f);
 
-	simulation_step(timer.scale * 0.01f);
+	for (auto point: points) {
+		particle_sphere.model.translation = point;
+		particle_sphere.material.color = { 1,0,0 };
+		draw(particle_sphere, environment);	
+	}
 
-	particle_sphere.model.translation = pA;
-	particle_sphere.material.color = { 0,0,0 };
-	draw(particle_sphere, environment);
-
-	particle_sphere.model.translation = pB;
-	particle_sphere.material.color = { 1,0,0 };
-	draw(particle_sphere, environment);
-
-	draw_segment(pA, pB);
-
+	for (int i = 0; i < points.size()-1; i++)
+		draw_segment(points[i], points[i+1]);
 }
 
 void scene_structure::display_gui()
